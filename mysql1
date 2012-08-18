@@ -1,0 +1,50 @@
+use abhinav;
+
+create table testing_table(
+name varchar(25),
+contact_name varchar(10),
+roll_no varchar(10)
+);
+
++--------------+-------------+------+-----+---------+-------+
+| Field        | Type        | Null | Key | Default | Extra |
++--------------+-------------+------+-----+---------+-------+
+| name         | varchar(25) | YES  |     | NULL    |       |
+| contact_name | varchar(10) | YES  |     | NULL    |       |
+| roll_no      | varchar(10) | YES  |     | NULL    |       |
++--------------+-------------+------+-----+---------+-------+
+
+ insert into testing_table(name,contact_name,roll_no) values ('James Hall','James','001');
+ insert into testing_table(name,contact_name,roll_no) values ('Matt Damon','Matt','002');
+
+
+  select * from testing_table;
++------------+--------------+---------+
+| name       | contact_name | roll_no |
++------------+--------------+---------+
+| James Hall | James        | 001     |
+| Matt Damon | Matt         | 002     |
++------------+--------------+---------+
+
+
+alter table testing_table 
+  drop column name,
+  change contact_name username varchar(20),
+  add first_name varchar(20),
+  add last_name varchar(20),
+  modify roll_no int;
+
+desc testing_table;
++------------+-------------+------+-----+---------+-------+
+| Field      | Type        | Null | Key | Default | Extra |
++------------+-------------+------+-----+---------+-------+
+| username   | varchar(20) | YES  |     | NULL    |       |
+| roll_no    | int(11)     | YES  |     | NULL    |       |
+| first_name | varchar(20) | YES  |     | NULL    |       |
+| last_name  | varchar(20) | YES  |     | NULL    |       |
++------------+-------------+------+-----+---------+-------+
+
+
+
+
+
