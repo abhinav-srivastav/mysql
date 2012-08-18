@@ -1,0 +1,41 @@
+mysql -h localhost -p -u root;
+
+create database vtapp;
+
+grant all on vtapp.* to 'vtapp_user'@'localhost';
+
+ quit;
+
+ mysql -h localhost -p -u vtapp_user
+Enter password: 
+
+ use vtapp;
+Database changed
+
+ create table tracks
+    -> ( name varchar(20),
+    -> status varchar(10)
+    -> );
+
+desc tracks;
++--------+-------------+------+-----+---------+-------+
+| Field  | Type        | Null | Key | Default | Extra |
++--------+-------------+------+-----+---------+-------+
+| name   | varchar(20) | YES  |     | NULL    |       |
+| status | varchar(10) | YES  |     | NULL    |       |
++--------+-------------+------+-----+---------+-------+
+
+ insert into tracks(name,status) values('html','reviewed');
+
+ select * from tracks;
++------+----------+
+| name | status   |
++------+----------+
+| html | reviewed |
++------+----------+
+
+
+ drop table tracks;
+Query OK, 0 rows affected (0.04 sec)
+
+
