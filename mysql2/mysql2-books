@@ -1,0 +1,170 @@
+create table branch(
+bcode varchar(5) not null,
+primary key(bcode),
+librarian varchar(20),
+address varchar(45)
+);
+
+ desc branch;
++-----------+-------------+------+-----+---------+-------+
+| Field     | Type        | Null | Key | Default | Extra |
++-----------+-------------+------+-----+---------+-------+
+| bcode     | varchar(5)  | NO   | PRI | NULL    |       |
+| librarian | varchar(20) | YES  |     | NULL    |       |
+| address   | varchar(45) | YES  |     | NULL    |       |
++-----------+-------------+------+-----+---------+-------+
+3 rows in set (0.00 sec)
+
+
+
+
+
+insert into branch(bcode,librarian,address) values ('b1','John Smith','2 Anglesea Rd');
+insert into branch(bcode,librarian,address) values ('b2','Mary Jones','34 Pearse St');
+insert into branch(bcode,librarian,address) values ('b3','Francis Owens','Grange X');
+
+select * from branch;
++-------+---------------+---------------+
+| bcode | librarian     | address       |
++-------+---------------+---------------+
+| b1    | John Smith    | 2 Anglesea Rd |
+| b2    | Mary Jones    | 34 Pearse St  |
+| b3    | Francis Owens | Grange X      |
++-------+---------------+---------------+
+3 rows in set (0.00 sec)
+
+
+create table titles
+(
+title varchar(20) not null,
+primary key(title),
+author varchar(20),
+publisher varchar(20)
+); 
+
+desc titles;
++-----------+-------------+------+-----+---------+-------+
+| Field     | Type        | Null | Key | Default | Extra |
++-----------+-------------+------+-----+---------+-------+
+| title     | varchar(20) | NO   | PRI | NULL    |       |
+| author   | varchar(20) | YES  |     | NULL    |       |
+| publisher | varchar(20) | YES  |     | NULL    |       |
++-----------+-------------+------+-----+---------+-------+
+3 rows in set (0.00 sec)
+
+insert into titles(title,author,publisher) values ('Susannah','Ann Brown','Macmillan');
+insert into titles(title,author,publisher) values ('How to Fish','Amy Fly','Stop Press');
+insert into titles(title,author,publisher) values ('A History of Dublin','David Little','Wiley');
+insert into titles(title,author,publisher) values ('Computers','Blaise Pascal','Applewoods');
+insert into titles(title,author,publisher) values ('The Wife','Ann Brown','Macmillan');
+
+select * from titles;
++---------------------+---------------+------------+
+| title               | aurthor       | publisher  |
++---------------------+---------------+------------+
+| A History of Dublin | David Little  | Wiley      |
+| Computers           | Blaise Pascal | Applewoods |
+| How to Fish         | Amy Fly       | Stop Press |
+| Susannah            | Ann Brown     | Macmillan  |
+| The Wife            | Ann Brown     | Macmillan  |
++---------------------+---------------+------------+
+5 rows in set (0.01 sec)
+
+create table holdings
+(
+branch varchar(5) not null,
+index branch_ind(branch),
+foreign key(branch) references branch(bcode)
+on delete cascade,
+title varchar(20) not null,
+index title_ind(title),
+foreign key(title) references titles(title)
+on delete cascade,
+copies int
+);
+
+ desc holdings;
++--------+-------------+------+-----+---------+-------+
+| Field  | Type        | Null | Key | Default | Extra |
++--------+-------------+------+-----+---------+-------+
+| branch | varchar(5)  | NO   | MUL | NULL    |       |
+| title  | varchar(20) | NO   | MUL | NULL    |       |
+| copies | int(11)     | YES  |     | NULL    |       |
++--------+-------------+------+-----+---------+-------+
+3 rows in set (0.00 sec)
+
+insert into holdings (branch,title,copies) values ('b1','Susannah',3);
+insert into holdings (branch,title,copies) values ('b1','How to Fish',2);
+insert into holdings (branch,title,copies) values ('b1','A History of Dublin',1);
+insert into holdings (branch,title,copies) values ('b2','How to Fish',4);
+insert into holdings (branch,title,copies) values ('b2','Computers',2);
+insert into holdings (branch,title,copies) values ('b2','The Wife',3);
+insert into holdings (branch,title,copies) values ('b3','A History of Dublin',1);
+insert into holdings (branch,title,copies) values ('b3','Computers',4);
+insert into holdings (branch,title,copies) values ('b3','Susannah',3);
+insert into holdings (branch,title,copies) values ('b3','The Wife',1);
+
+ select * from holdings;
++--------+---------------------+--------+
+| branch | title               | copies |
++--------+---------------------+--------+
+| b1     | Susannah            |      3 |
+| b1     | How to Fish         |      2 |
+| b1     | A History of Dublin |      1 |
+| b2     | How to Fish         |      4 |
+| b2     | Computers           |      2 |
+| b2     | The Wife            |      3 |
+| b3     | A History of Dublin |      1 |
+| b3     | Computers           |      4 |
+| b3     | Susannah            |      3 |
+| b3     | The Wife            |      1 |
++--------+---------------------+--------+
+10 rows in set (0.00 sec)
+
+
+ select title from titles where publisher = 'Macmillan';
++----------+
+| title    |
++----------+
+| Susannah |
+| The Wife |
++----------+
+2 rows in set (0.00 sec)
+
+  select branch,title from holdings where holdings.title in (select title from titles where author = 'Ann Brown');
++--------+----------+
+| branch | title    |
++--------+----------+
+| b1     | Susannah |
+| b2     | The Wife |
+| b3     | Susannah |
+| b3     | The Wife |
++--------+----------+
+4 rows in set (0.00 sec)
+
+select branch, holdings.title from holdings
+left join titles on holdings.title = titles.title where titles.author = 'Ann Brown';
++--------+----------+
+| branch | title    |
++--------+----------+
+| b1     | Susannah |
+| b3     | Susannah |
+| b2     | The Wife |
+| b3     | The Wife |
++--------+----------+
+4 rows in set (0.00 sec)
+
+
+select distinct h.branch,sum(copies) as 'number of books'  from holdings as h,titles as t where h.title = t.title group by h.branch;
++--------+-----------------+
+| branch | number of books |
++--------+-----------------+
+| b1     |               6 |
+| b2     |               9 |
+| b3     |               9 |
++--------+-----------------+
+3 rows in set (0.00 sec)
+
+
+
+
