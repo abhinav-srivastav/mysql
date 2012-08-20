@@ -1,0 +1,17 @@
+
+abhinav@abhinav-HP-ProBook-4530s:~$ mysqldump -u hpuser -p  abhinav > exercise.sql
+
+ mysql -h localhost -p -u root
+Enter password: 
+
+ GRANT ALL ON restored.* TO 'hpuser'@'localhost' IDENTIFIED BY
+    -> 'abhinav@73';
+Query OK, 0 rows affected (0.06 sec)
+
+
+create database restored;
+Query OK, 1 row affected (0.00 sec)
+
+abhinav@abhinav-HP-ProBook-4530s:~$ mysql - u hpuser -p restored < exercise.sql;
+
+
