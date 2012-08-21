@@ -1,0 +1,88 @@
+4.1
+
+ explain select * from articles inner join comments on articles.article = comments.article;
++----+-------------+----------+------+---------------+------+---------+------+------+--------------------------------+
+| id | select_type | table    | type | possible_keys | key  | key_len | ref  | rows | Extra                          |
++----+-------------+----------+------+---------------+------+---------+------+------+--------------------------------+
+|  1 | SIMPLE      | comments | ALL  | article_ind   | NULL | NULL    | NULL |    3 |                                |
+|  1 | SIMPLE      | articles | ALL  | PRIMARY       | NULL | NULL    | NULL |    4 | Using where; Using join buffer |
++----+-------------+----------+------+---------------+------+---------+------+------+--------------------------------+
+2 rows in set (0.00 sec)
+
+
+id = 1 ----
+sequence of select  is 1.
+
+select_type = simple ----
+it does not use union or subquery.
+
+table = comments/articles ----
+table for the output were comments and articles
+
+type = all ----
+full table is scanned for each combination of row.
+
+possible_keys = article_ind/primary ----
+indexes 'article_ind' and 'primary(for article in articles table)' can be used as key.
+
+key = NULL ----
+no key was used for indexing.
+
+key_len = NULL ----
+since no key was used for indexing,key_len is also NULL.
+
+ref = NULL ----
+since there was no key to be compared with,this column is also NULL.
+
+rows = 3/4 ----
+estimation of the no. of rows to be examined to execute the query for table comments was 3 but for articles was 4.
+
+extra = (Using where; Using join buffer) ----
+tells us that mysql used 'where' and 'join buffer' to resolve the query.
+
+4.2
+
+ explain select * from articles where articles.article in (select comments.article from comments);
++----+--------------------+----------+----------------+---------------+-------------+---------+------+------+-------------+
+| id | select_type        | table    | type           | possible_keys | key         | key_len | ref  | rows | Extra       |
++----+--------------------+----------+----------------+---------------+-------------+---------+------+------+-------------+
+|  1 | PRIMARY            | articles | ALL            | NULL          | NULL        | NULL    | NULL |    4 | Using where |
+|  2 | DEPENDENT SUBQUERY | comments | index_subquery | article_ind   | article_ind | 4       | func |    1 | Using index |
++----+--------------------+----------+----------------+---------------+-------------+---------+------+------+-------------+
+2 rows in set (0.00 sec)
+
+
+1. id are different so,the were processed one after the other.
+
+2.select_type are different ,one is primary which is the outer most subquery and the other is dependent subquery which is first select in      
+  subquery,dependent on outer query.
+
+3. tables remain the same.
+
+4.type - ALL/index_subquery ----
+  ALL - for articles table since * was the selector,type was ALL
+  index_subquery - for comments table,join is working to replaces IN subqueries, but it works for nonunique indexes in subqueries
+
+5.possible_keys - NULL/article_ind ----
+  NULL - no possible key for indexing
+  article_ind - uses article_ind as index for foreign key articles(article)
+
+6.key = NULL/article_ind ----
+  NULL - no index used
+  article_ind - using article_ind to index the query
+
+7.key_len = NULL/4 ----
+  NULL - since no key, no key_len
+  4 - no of the rows for the indexed query
+
+8.ref = NULL/func ----
+  NULL = since no key,no ref
+  func = use of function 
+
+9.rows = 4/1 ----
+  4 = total rows for articles
+  1 = total rows for comments
+
+10.extra =  using where/using index ----
+   using where = mysql used where for the outer query
+   using index = mysql used index for the subquery

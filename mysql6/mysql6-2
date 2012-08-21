@@ -1,0 +1,9 @@
+2.1
+
+It means that the estimation of the no. of rows to be examined by mysql is pefectly the same as the actual no. of rows examined to execute the query.
+
+2.2
+
+No,the query is not optimal as the 'key' column holds NULL.
+The addition of indexes will help optimize the query.
+Indexes help execute the query faster by using indexing to find rows rather than searching the whole table('s).

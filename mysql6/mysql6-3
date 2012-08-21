@@ -1,0 +1,5 @@
+
+3.1
+we would index the commentable_id first,as it is the primary key.
+next commentable_type needs to be indexed 
+and lastly user_id would be beneficial to be indexed 

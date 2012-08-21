@@ -1,0 +1,107 @@
+1.
+Each output row from EXPLAIN provides information about a table.
+
+Each row contains values :-
+
+     id - select identifier
+
+     select_type - select type
+
+     table - table for the output row
+
+     type - join type
+
+     possible_keys - possible indexes to choose
+
+     key - index actually chosen
+
+     key_len - length of the chosen key
+
+     ref - columns compared to the index
+
+     rows - estimate of rows to be examined
+
+     Extra - Additional information
+
+
+    id ----- This is the sequential number of the select within the query. The value can be NULL if the row refers to the union result of other rows. In this case, the table column shows a value like <unionX,Y> to indicate that the row refers to the union of the rows with id values of X and Y.
+
+    select_type ----- it can be any of the following :-
+
+    SIMPLE - simple select (not using UNION or subqueries)
+
+    PRIMARY - outermost select
+
+    UNION - second or later select statement in a UNION
+
+    DEPENDENT UNION -  second or later SELECT statement in a UNION, dependent on outer query
+
+    UNION RESULT - result of a UNION
+
+    SUBQUERY - first select in subquery
+
+    DEPENDENT SUBQUERY - first select in subquery, dependent on outer query
+
+    DERIVED - derived table select or subquery in 'from clause'
+
+    UNCACHEABLE SUBQUERY - subquery for which the result cannot be cached and must be re-evaluated for each row of the outer query
+
+    DEPENDENT - typically signifies the use of a correlated subquery
+
+    
+
+    table ---- name of the table to which the row of output refers. This can also be a value like <unionM,N> to indicate that the row refers to the union of the rows with id values of M and N, or a value like <derivedN> to indicate that the row refers to the derived table result for the row with an id value of N.
+
+
+    type ---- join type.  The type column of EXPLAIN output describes how tables are joined. The following list describes the join types:-
+
+    system - table has only one row (= system table). This is a special case of the const join type.
+
+    const - has at most one matching row, which is read at the start of the query. Because there is only one row, values from the column in this row can be regarded as constants by the rest of the optimizer. const tables are very fast because they are read only once. const is used when you compare all parts of a PRIMARY KEY or UNIQUE index to constant values. In the following queries, tbl_name can be used as a const table:
+
+    SELECT * FROM tbl_name WHERE primary_key=1;
+
+    SELECT * FROM tbl_name
+      WHERE primary_key_part1=1 AND primary_key_part2=2;
+
+    eq_ref - one row is read from this table for each combination of rows from the previous tables. Other than the system and const types, this is the best possible join type. It is used when all parts of an index are used by the join and the index is a PRIMARY KEY or UNIQUE NOT NULL index. eq_ref can be used for indexed columns that are compared using the = operator. The comparison value can be a constant or an expression that uses columns from tables that are read before this table.
+
+    ref - all rows with matching index values are read from this table for each combination of rows from the previous tables. ref is used if the join uses only a leftmost prefix of the key or if the key is not a PRIMARY KEY or UNIQUE index .If the key that is used matches only a few rows, this is a good join type. ref can be used for indexed columns that are compared using the = or <=> operator.
+
+    fulltext - performed using a FULLTEXT index.
+
+    ref_or_null - is like ref, but with the addition that MySQL does an extra search for rows that contain NULL values. This join type optimization is used most often in resolving subqueries.
+
+    index_merge - indicates that the Index Merge optimization is used. In this case, the key column in the output row contains a list of indexes used, and key_len contains a list of the longest key parts for the indexes used.
+
+    unique_subquery - replaces ref for some IN subqueries of the following form:
+                      value IN (SELECT primary_key FROM single_table WHERE some_expr).unique_subquery is just an index lookup function that replaces the subquery completely for better efficiency.
+
+    index_subquery -  This join type is similar to unique_subquery. It replaces IN subqueries, but it works for nonunique indexes in subqueries of the following form: value IN (SELECT key_column FROM single_table WHERE some_expr)
+
+    range - only rows that are in a given range are retrieved, using an index to select the rows. The key column in the output row indicates which index is used. The key_len contains the longest key part that was used. The ref column is NULL for this type.
+
+    index - join type is the same as ALL, except that only the index tree is scanned. This usually is faster than ALL because the index file usually is smaller than the data file.
+
+   ALL - full table scan is done for each combination of rows from the previous tables. This is normally not good if the table is the first table not marked const, and usually very bad in all other cases. Normally, you can avoid ALL by adding indexes that enable row retrieval from the table based on constant values or column values from earlier tables.
+
+
+
+
+
+    possible_keys ----the possible_keys column indicates which indexes MySQL can choose from use to find the rows in this table. Note that this column is totally independent of the order of the tables as displayed in the output from EXPLAIN. That means that some of the keys in possible_keys might not be usable in practice with the generated table order.
+
+    key ---- indicates the key (index) that MySQL actually decided to use. If MySQL decides to use one of the possible_keys indexes to look up rows, that index is listed as the key value.It is possible that key will name an index that is not present in the possible_keys value. This can happen if none of the possible_keys indexes are suitable for looking up rows, but all the columns selected by the query are columns of some other index. That is, the named index covers the selected columns, so although it is not used to determine which rows to retrieve, an index scan is more efficient than a data row scan.
+
+    - For InnoDB, a secondary index might cover the selected columns even if the query also selects the primary key because InnoDB stores the primary key value with each secondary index. If key is NULL, MySQL found no index to use for executing the query more efficiently.
+
+    - For MyISAM, NDB, and BDB tables, running ANALYZE TABLE helps the optimizer choose better indexes. For MyISAM tables, myisamchk --analyze does the same as ANALYZE TABLE. See Section 7.6, “MyISAM Table Maintenance and Crash Recovery”.
+
+    key_len ---- indicates the length of the key that MySQL decided to use. The length is NULL if the key column says NULL. Note that the value of key_len enables to determine how many parts of a multiple-part key MySQL actually uses.
+
+    ref ---- shows which columns or constants are compared to the index named in the key column to select rows from the table.
+
+    rows ---- indicates the number of rows MySQL believes it must examine to execute the query.For InnoDB tables, this number is an estimate, and may not always be exact.
+
+    Extra ---- contains additional information about how MySQL resolves the query. For descriptions of the different values, see EXPLAIN Extra Information.
+
