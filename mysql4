@@ -1,0 +1,184 @@
+create table users
+(
+user_id int not null,
+primary key(user_id),
+user_category varchar(6)
+);
+
+desc users;
++---------------+------------+------+-----+---------+-------+
+| Field         | Type       | Null | Key | Default | Extra |
++---------------+------------+------+-----+---------+-------+
+| user_id       | int(11)    | NO   | PRI | NULL    |       |
+| user_category | varchar(6) | YES  |     | NULL    |       |
++---------------+------------+------+-----+---------+-------+
+2 rows in set (0.00 sec)
+
+insert into users (user_id,user_category) values (101,'admin');
+insert into users (user_id,user_category) values (201,'normal');
+insert into users (user_id,user_category) values (202,'normal');
+
+ select * from users;
++---------+---------------+
+| user_id | user_category |
++---------+---------------+
+|     101 | admin         |
+|     201 | normal        |
+|     202 | normal        |
++---------+---------------+
+3 rows in set (0.00 sec)
+
+create table articles
+(
+article int not null,
+primary key(article),
+user_id int not null,
+index user_id_ind(user_id),
+foreign key(user_id) references users(user_id)
+on delete cascade,
+category varchar(10) not null
+);
+
+ desc articles;
++----------+-------------+------+-----+---------+-------+
+| Field    | Type        | Null | Key | Default | Extra |
++----------+-------------+------+-----+---------+-------+
+| article  | int(11)     | NO   | PRI | NULL    |       |
+| user_id  | int(11)     | NO   | MUL | NULL    |       |
+| category | varchar(10) | NO   |     | NULL    |       |
++----------+-------------+------+-----+---------+-------+
+3 rows in set (0.00 sec)
+
+insert into articles(article,user_id,category) values(1,101,'Instructions');
+insert into articles(article,user_id,category) values(2,202,'general');
+insert into articles(article,user_id,category) values(3,201,'fiction');
+insert into articles(article,user_id,category) values(4,201,'horror');
+
+ select * from articles;
++---------+---------+------------+
+| article | user_id | category   |
++---------+---------+------------+
+|       1 |     101 | Instructio |
+|       2 |     202 | general    |
+|       3 |     201 | fiction    |
+|       4 |     201 | horror     |
++---------+---------+------------+
+4 rows in set (0.00 sec)
+
+
+
+
+create table comments
+(
+article int not null,
+index article_ind(article),
+foreign key(article) references articles(article)
+on delete cascade,
+user_id int not null,
+index user_id_ind(user_id),
+foreign key(user_id) references users(user_id)
+on delete cascade,
+comments varchar(50)
+); 
+
+ desc comments;
++----------+-------------+------+-----+---------+-------+
+| Field    | Type        | Null | Key | Default | Extra |
++----------+-------------+------+-----+---------+-------+
+| article  | int(11)     | NO   | MUL | NULL    |       |
+| user_id  | int(11)     | NO   | MUL | NULL    |       |
+| comments | varchar(50) | YES  |     | NULL    |       |
++----------+-------------+------+-----+---------+-------+
+3 rows in set (0.00 sec)
+
+insert into comments(article,user_id,comments) values(2,201,'this is good');
+insert into comments(article,user_id,comments) values(2,201,'but last point is wrong');
+insert into comments(article,user_id,comments) values(4,101,'keep tag lines for readers');
+
+ select * from comments;
++---------+---------+----------------------------+
+| article | user_id | comments                   |
++---------+---------+----------------------------+
+|       2 |     201 | this is good               |
+|       2 |     201 | but last point is wrong    |
+|       4 |     101 | keep tag lines for readers |
++---------+---------+----------------------------+
+3 rows in set (0.00 sec)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2.
+
+select article from articles where user_id = 202;
++---------+
+| article |
++---------+
+|       2 |
++---------+
+1 row in set (0.00 sec)
+
+
+
+
+
+
+3.
+ select comm.article,comm.comments from comments as comm right join articles  on comm.article = articles.article where articles.user_id = 202;
++---------+-------------------------+
+| article | comments                |
++---------+-------------------------+
+|       2 | this is good            |
+|       2 | but last point is wrong |
++---------+-------------------------+
+2 rows in set (0.00 sec)
+
+4.
+ select art.article from articles as art left join comments on art.article = comments.article where comments.article is NULL;
++---------+
+| article |
++---------+
+|       1 |
+|       3 |
++---------+
+2 rows in set (0.00 sec)
+
+5.
+
+ select article,max(counted) as 'no of comments' from (select article , count(article) as counted  from comments group by article limit 1) as tb1 group by article;
++---------+----------------+
+| article | no of comments |
++---------+----------------+
+|       2 |              2 |
++---------+----------------+
+1 row in set (0.00 sec)
+
+6.
+select article,user_id,count(comments) c from comments group by article,user_id desc ;
+
+
+  select art.article,art.user_id,count(comments.comments) c from articles as art left join comments on art.article = comments.article group by art.article,art.user_id having c < 2;
++---------+---------+---+
+| article | user_id | c |
++---------+---------+---+
+|       1 |     101 | 0 |
+|       3 |     201 | 0 |
+|       4 |     201 | 1 |
++---------+---------+---+
+3 rows in set (0.01 sec)
+
+
+
