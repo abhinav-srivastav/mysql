@@ -137,7 +137,7 @@ select article from articles where user_id = 202;
 
 
 3.
- select comm.article,comm.comments from comments as comm join articles  on comm.article = articles.article where articles.user_id = 202;
+ select comm.article,comm.comments from comments as comm join articles as art on comm.article = art.article where art.user_id = 202;
 +---------+-------------------------+
 | article | comments                |
 +---------+-------------------------+
