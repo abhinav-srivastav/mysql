@@ -137,7 +137,7 @@ select article from articles where user_id = 202;
 
 
 3.
- select comm.article,comm.comments from comments as comm right join articles  on comm.article = articles.article where articles.user_id = 202;
+ select comm.article,comm.comments from comments as comm join articles  on comm.article = articles.article where articles.user_id = 202;
 +---------+-------------------------+
 | article | comments                |
 +---------+-------------------------+
@@ -157,18 +157,24 @@ select article from articles where user_id = 202;
 2 rows in set (0.00 sec)
 
 5.
-
- select article,max(counted) as 'no of comments' from (select article , count(article) as counted  from comments group by article limit 1) as tb1 group by article;
-+---------+----------------+
-| article | no of comments |
-+---------+----------------+
-|       2 |              2 |
-+---------+----------------+
+ select article , @max := count(article) as counted  from comments group by article order by counted desc limit 1;
++---------+---------+
+| article | counted |
++---------+---------+
+|       2 |       2 |
++---------+---------+
 1 row in set (0.00 sec)
 
-6.
-select article,user_id,count(comments) c from comments group by article,user_id desc ;
+mysql> select article ,count(article) as counted  from comments group by article having counted = @max;
++---------+---------+
+| article | counted |
++---------+---------+
+|       2 |       2 |
+|       5 |       2 |
++---------+---------+
+2 rows in set (0.00 sec)
 
+6.
 
   select art.article,art.user_id,count(comments.comments) c from articles as art left join comments on art.article = comments.article group by art.article,art.user_id having c < 2;
 +---------+---------+---+

@@ -131,28 +131,26 @@ insert into holdings (branch,title,copies) values ('b3','The Wife',1);
 +----------+
 2 rows in set (0.00 sec)
 
-  select branch,title from holdings where holdings.title in (select title from titles where author = 'Ann Brown');
-+--------+----------+
-| branch | title    |
-+--------+----------+
-| b1     | Susannah |
-| b2     | The Wife |
-| b3     | Susannah |
-| b3     | The Wife |
-+--------+----------+
-4 rows in set (0.00 sec)
+  select distinct branch,group_concat(title) from holdings where holdings.title in (select title from titles where author = 'Ann Brown') group by branch;
++--------+---------------------+
+| branch | group_concat(title) |
++--------+---------------------+
+| b1     | Susannah            |
+| b2     | The Wife            |
+| b3     | Susannah,The Wife   |
++--------+---------------------+
+3 rows in set (0.00 sec)
 
-select branch, holdings.title from holdings
-left join titles on holdings.title = titles.title where titles.author = 'Ann Brown';
-+--------+----------+
-| branch | title    |
-+--------+----------+
-| b1     | Susannah |
-| b3     | Susannah |
-| b2     | The Wife |
-| b3     | The Wife |
-+--------+----------+
-4 rows in set (0.00 sec)
+
+mysql> select distinct branch, group_concat(holdings.title) from holdings join titles on holdings.title = titles.title where titles.author = 'Ann Brown' group by branch;
++--------+------------------------------+
+| branch | group_concat(holdings.title) |
++--------+------------------------------+
+| b1     | Susannah                     |
+| b2     | The Wife                     |
+| b3     | Susannah,The Wife            |
++--------+------------------------------+
+3 rows in set (0.00 sec)
 
 
 select distinct h.branch,sum(copies) as 'number of books'  from holdings as h,titles as t where h.title = t.title group by h.branch;
