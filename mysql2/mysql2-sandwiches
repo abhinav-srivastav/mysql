@@ -143,16 +143,15 @@ join tastes on sandwiches.filling = tastes.filling where tastes.name = 'Jones';
 
  
 
- select  s.location,group_concat(distinct t.name) as 'people who can eat' from sandwiches as s , tastes as t where s.filling = t.filling group by s.location;
-+----------+--------------------+
-| location | people who can eat |
-+----------+--------------------+
-| Buttery  | Jones,Green,Brown  |
-| Lincoln  | Brown,Green        |
-| O'Neil's | Jones,Green,Brown  |
-| Old Nag  | Brown,Green        |
-+----------+--------------------+
-4 rows in set (0.00 sec)
-
+ 
+select  s.location,group_concat(distinct t.name) as 'people who can eat' ,count(distinct t.name) as 'no of people'  from sandwiches as s , tastes as t where s.filling = t.filling group by s.location;
++----------+--------------------+--------------+
+| location | people who can eat | no of people |
++----------+--------------------+--------------+
+| Buttery  | Green,Brown,Jones  |            3 |
+| Lincoln  | Brown,Green        |            2 |
+| O'Neil's | Brown,Jones,Green  |            3 |
+| Old Nag  | Brown,Green        |            2 |
++----------+--------------------+--------------+
 4 rows in set (0.00 sec)
 
