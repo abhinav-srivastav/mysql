@@ -157,7 +157,7 @@ select article from articles where user_id = 202;
 2 rows in set (0.00 sec)
 
 5.
- select article ,count(article) as maximum  from comments group by article having maximum = 
+ select article ,count(article) as counted  from comments group by article having maximum = 
 (select count(article) as counted from comments group by article order by counted desc limit 1);
 +---------+---------+
 | article | counted |
