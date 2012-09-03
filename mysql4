@@ -157,15 +157,8 @@ select article from articles where user_id = 202;
 2 rows in set (0.00 sec)
 
 5.
- select article , @max := count(article) as counted from comments group by article order by counted desc limit 1;
-+---------+---------+
-| article | counted |
-+---------+---------+
-|       2 |       2 |
-+---------+---------+
-1 row in set (0.00 sec)
-
-mysql> select article ,count(article) as maximum  from (select article ,count(article) as counted from comments group by article order by counted desc limit 1)as tb1 group by article having maximum  = counted;
+ select article ,count(article) as maximum  from comments group by article having maximum = 
+(select count(article) as counted from comments group by article order by counted desc limit 1);
 +---------+---------+
 | article | counted |
 +---------+---------+
