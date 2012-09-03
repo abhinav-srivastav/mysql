@@ -158,7 +158,8 @@ select article from articles where user_id = 202;
 
 5.
  select article ,count(article) as counted  from comments group by article having counted = 
-(select count(article) as counted from comments group by article order by counted desc limit 1);
+(select count(article) as co from comments group by article order by co desc limit 1);
+
 +---------+---------+
 | article | counted |
 +---------+---------+
