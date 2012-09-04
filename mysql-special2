@@ -1,0 +1,359 @@
+create table user_types
+(
+type varchar(20),
+id int not null auto_increment,
+primary key(id)
+);
+
+ desc user_types;
++-------+-------------+------+-----+---------+----------------+
+| Field | Type        | Null | Key | Default | Extra          |
++-------+-------------+------+-----+---------+----------------+
+| type  | varchar(20) | YES  |     | NULL    |                |
+| id    | int(11)     | NO   | PRI | NULL    | auto_increment |
++-------+-------------+------+-----+---------+----------------+
+2 rows in set (0.00 sec)
+
+select * from user_types;
++-------------+----+
+| type        | id |
++-------------+----+
+| admin       |  1 |
+| track owner |  2 |
+| reviewer    |  3 |
+| runner      |  4 |
++-------------+----+
+4 rows in set (0.00 sec)
+
+
+
+
+create table usernames
+(
+name varchar(40),
+id int not null auto_increment,
+primary key (id)
+);
+
+ desc usernames;
++-------+-------------+------+-----+---------+----------------+
+| Field | Type        | Null | Key | Default | Extra          |
++-------+-------------+------+-----+---------+----------------+
+| name  | varchar(40) | YES  |     | NULL    |                |
+| id    | int(11)     | NO   | PRI | NULL    | auto_increment |
++-------+-------------+------+-----+---------+----------------+
+2 rows in set (0.00 sec)
+
+ select * from usernames;
++---------+----+
+| name    | id |
++---------+----+
+| manik   |  1 |
+| akhil   |  2 |
+| waseem  |  3 |
+| abhinav |  4 |
++---------+----+
+4 rows in set (0.00 sec)
+
+
+
+
+create table users
+(
+user int not null,
+foreign key (user) references usernames(id)
+on delete cascade,
+type int not null,
+foreign key (type) references user_types(id)
+on delete cascade
+);
+ desc users;
++-------+---------+------+-----+---------+-------+
+| Field | Type    | Null | Key | Default | Extra |
++-------+---------+------+-----+---------+-------+
+| user  | int(11) | NO   | MUL | NULL    |       |
+| type  | int(11) | NO   | MUL | NULL    |       |
++-------+---------+------+-----+---------+-------+
+2 rows in set (0.00 sec)
+
+ select * from users;
++------+------+
+| user | type |
++------+------+
+|    1 |    1 |
+|    1 |    2 |
+|    1 |    3 |
+|    2 |    2 |
+|    2 |    3 |
+|    3 |    3 |
+|    4 |    4 |
++------+------+
+
+
+
+create table tracks
+(
+id int not null auto_increment,
+primary key (id),
+name varchar(20) not null,
+owner int not null,
+foreign key(owner) references usernames(id)
+on delete cascade
+); 
+
+desc tracks;
++-------+-------------+------+-----+---------+----------------+
+| Field | Type        | Null | Key | Default | Extra          |
++-------+-------------+------+-----+---------+----------------+
+| id    | int(11)     | NO   | PRI | NULL    | auto_increment |
+| name  | varchar(20) | NO   |     | NULL    |                |
+| owner | int(11)     | NO   | MUL | NULL    |                |
++-------+-------------+------+-----+---------+----------------+
+3 rows in set (0.00 sec)
+
+ select * from tracks;
++----+------------+-------+
+| id | name       | owner |
++----+------------+-------+
+|  1 | html       |     1 |
+|  2 | javascript |     2 |
++----+------------+-------+
+2 rows in set (0.00 sec)
+
+
+
+create table question_types
+(
+id int not null auto_increment ,
+primary key(id),
+type varchar(10) not null
+);
+
+ desc question_types;
++-------+-------------+------+-----+---------+----------------+
+| Field | Type        | Null | Key | Default | Extra          |
++-------+-------------+------+-----+---------+----------------+
+| id    | int(11)     | NO   | PRI | NULL    | auto_increment |
+| type  | varchar(10) | NO   |     | NULL    |                |
++-------+-------------+------+-----+---------+----------------+
+2 rows in set (0.00 sec)
+
+ select * from question_types;
++----+----------+
+| id | type     |
++----+----------+
+|  1 | tasks    |
+|  2 | exercise |
++----+----------+
+
+
+
+create table track_questions
+(
+question int not null,
+track int not null,
+foreign key(track) references tracks(id)
+on delete cascade,
+primary key(question,track),
+question_type int not null,
+foreign key(question_type) references question_types(id)
+on delete cascade,
+description longtext not null
+);
+ desc track_questions;
++---------------+----------+------+-----+---------+-------+
+| Field         | Type     | Null | Key | Default | Extra |
++---------------+----------+------+-----+---------+-------+
+| question      | int(11)  | NO   | PRI | NULL    |       |
+| track         | int(11)  | NO   | PRI | NULL    |       |
+| question_type | int(11)  | NO   | MUL | NULL    |       |
+| description   | longtext | NO   |     | NULL    |       |
++---------------+----------+------+-----+---------+-------+
+4 rows in set (0.00 sec)
+
+ select * from track_questions;
++----------+-------+---------------+--------------------------------------------------------+
+| question | track | question_type | description                                            |
++----------+-------+---------------+--------------------------------------------------------+
+|        1 |     1 |             1 | Introduction to HTML                                   |
+|        1 |     2 |             1 | Document Object Model(DOM) & Browser Object Model(BOM) |
+|        2 |     1 |             1 | Links                                                  |
+|        3 |     1 |             2 | form creation                                          |
+|        5 |     2 |             2 | check all /check none                                  |
++----------+-------+---------------+--------------------------------------------------------+
+5 rows in set (0.00 sec)
+
+
+
+create table runner_tracks
+(
+runner int not null,
+foreign key(runner) references usernames(id)
+on delete cascade,
+track int not null,
+foreign key(track) references tracks(id)
+on delete cascade,
+primary key(runner,track)
+);
+
+desc runner_tracks;
++--------+---------+------+-----+---------+-------+
+| Field  | Type    | Null | Key | Default | Extra |
++--------+---------+------+-----+---------+-------+
+| runner | int(11) | NO   | PRI | NULL    |       |
+| track  | int(11) | NO   | PRI | NULL    |       |
++--------+---------+------+-----+---------+-------+
+2 rows in set (0.00 sec)
+
+select * from  runner_tracks;
++--------+-------+
+| runner | track |
++--------+-------+
+|      4 |     1 |
+|      4 |     2 |
++--------+-------+
+2 rows in set (0.00 sec)
+
+
+
+
+
+create table review_status
+(
+id int not null auto_increment,
+primary key(id),
+review_status varchar(10) not null
+);
+
+desc review_status;
++---------------+-------------+------+-----+---------+----------------+
+| Field         | Type        | Null | Key | Default | Extra          |
++---------------+-------------+------+-----+---------+----------------+
+| id            | int(11)     | NO   | PRI | NULL    | auto_increment |
+| review_status | varchar(10) | NO   |     | NULL    |                |
++---------------+-------------+------+-----+---------+----------------+
+2 rows in set (0.00 sec)
+
+ select * from review_status;
++----+---------------+
+| id | review_status |
++----+---------------+
+|  1 | rejected      |
+|  2 | accepted      |
++----+---------------+
+2 rows in set (0.00 sec)
+
+
+
+create table assign_reviewer
+(
+runner int not null,
+foreign key(runner) references usernames(id)
+on delete cascade,
+exercise int not null,
+foreign key(exercise) references track_questions(question)
+on delete cascade,
+track int not null,
+foreign key(track) references tracks(id)
+on delete cascade,
+primary key (runner,exercise,track),
+reviewer int not null,
+foreign key(reviewer) references usernames(id)
+on delete cascade,
+review_status int ,
+foreign key(review_status) references review_status(id)
+on delete cascade
+);
+
+
+  desc assign_reviewer;
++---------------+---------+------+-----+---------+-------+
+| Field         | Type    | Null | Key | Default | Extra |
++---------------+---------+------+-----+---------+-------+
+| runner        | int(11) | NO   | PRI | NULL    |       |
+| exercise      | int(11) | NO   | PRI | NULL    |       |
+| track         | int(11) | NO   | PRI | NULL    |       |
+| reviewer      | int(11) | NO   | MUL | NULL    |       |
+| review_status | int(11) | YES  | MUL | NULL    |       |
++---------------+---------+------+-----+---------+-------+
+5 rows in set (0.00 sec)
+
+
+select * from assign_reviewer;
++--------+----------+-------+----------+---------------+
+| runner | exercise | track | reviewer | review_status |
++--------+----------+-------+----------+---------------+
+|      4 |        3 |     1 |        1 |             2 |
+|      4 |        5 |     2 |        2 |          NULL |
++--------+----------+-------+----------+---------------+
+2 rows in set (0.00 sec)
+
+
+
+create table task_status
+(
+id int not null auto_increment,
+primary key(id),
+status varchar(10) not null
+);
+
+ desc task_status;
++--------+-------------+------+-----+---------+----------------+
+| Field  | Type        | Null | Key | Default | Extra          |
++--------+-------------+------+-----+---------+----------------+
+| id     | int(11)     | NO   | PRI | NULL    | auto_increment |
+| status | varchar(10) | NO   |     | NULL    |                |
++--------+-------------+------+-----+---------+----------------+
+2 rows in set (0.00 sec)
+
+select * from task_status;
++----+----------+
+| id | status   |
++----+----------+
+|  1 | started  |
+|  2 | finished |
++----+----------+
+2 rows in set (0.01 sec)
+
+
+
+create table runner_status
+(
+runner int not null,
+foreign key(runner) references usernames(id)
+on delete cascade,
+task int not null,
+foreign key(task) references track_questions(question)
+on delete cascade,
+track int not null,
+foreign key(track) references tracks(id)
+on delete cascade,
+primary key (runner,task,track),
+status int not null,
+foreign key(status) references task_status(id)
+on delete cascade
+);
+
+ desc runner_status;
++--------+---------+------+-----+---------+-------+
+| Field  | Type    | Null | Key | Default | Extra |
++--------+---------+------+-----+---------+-------+
+| runner | int(11) | NO   | PRI | NULL    |       |
+| task   | int(11) | NO   | PRI | NULL    |       |
+| track  | int(11) | NO   | PRI | NULL    |       |
+| status | int(11) | NO   | MUL | NULL    |       |
++--------+---------+------+-----+---------+-------+
+4 rows in set (0.01 sec)
+
+ select * from runner_status;
++--------+------+-------+--------+
+| runner | task | track | status |
++--------+------+-------+--------+
+|      4 |    2 |     2 |      1 |
+|      4 |    1 |     1 |      2 |
+|      4 |    2 |     1 |      2 |
++--------+------+-------+--------+
+3 rows in set (0.00 sec)
+
+
+
