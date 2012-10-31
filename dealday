@@ -1,0 +1,46 @@
+//List of member who have ever bought something on Dealdey, their signup date, their first purchase category, First purchase price, Total number of purchases till date, Total money spent with the site till date
+
+select concat(users.firstname," ",users.lastname) as User, date(users.created_at) as "Date of joining", categories.name as "first purchase category",(du.unit_price * du.quantity) as "first purchase price"
+,COUNT(du.id) as "total orders",sum(du.unit_price * du.quantity) as "total money spent" from deals_users as du 
+join users join deals join categories
+on users.id = du.user_id
+and deals.id = du.deal_id
+and categories.id = deals.category_id 
+group by user_id order by du.created_at limit 15;
+
++---------------------------+-----------------+-------------------------+----------------------+--------------+-------------------+
+| User                      | Date of joining | first purchase category | first purchase price | total orders | total money spent |
++---------------------------+-----------------+-------------------------+----------------------+--------------+-------------------+
+| Chima Edomobi             | 2011-03-08      | Retail                  |                15.00 |            1 |             15.00 |
+| Willie Afahame            | 2011-03-09      | Retail                  |                15.00 |            1 |             15.00 |
+| Hanson Iheuko             | 2011-03-09      | Retail                  |                15.00 |            1 |             15.00 |
+| adedamola lawal           | 2011-03-09      | Retail                  |                15.00 |            1 |             15.00 |
+| ndukwe maduekwe           | 2011-03-10      | Retail                  |                15.00 |            1 |             15.00 |
+| richa bhardwaj            | 2011-03-07      | Retail                  |                15.00 |            2 |             30.00 |
+| Adefemi Adeleke           | 2011-03-13      | Retail                  |                15.00 |            1 |             15.00 |
+| Mentie Omotejowho         | 2011-03-13      | Retail                  |                15.00 |            3 |             45.00 |
+| chucky ezediaro           | 2011-03-13      | Retail                  |                15.00 |            2 |             30.00 |
+| Tope Akinremi             | 2011-03-10      | Food & Drink            |               900.00 |            5 |          26815.00 |
+| Demola Gbadegesin         | 2011-03-14      | Food & Drink            |              1800.00 |            3 |           4800.00 |
+| Rachel Akintunde-olarinde | 2011-03-14      | Food & Drink            |               900.00 |            1 |            900.00 |
+| Rama Shagaya              | 2011-03-14      | Food & Drink            |              3600.00 |            5 |          14200.00 |
+| Olakunle Martins          | 2011-03-14      | Food & Drink            |              1800.00 |            3 |           8700.00 |
+| Rajat Bhalla              | 2011-03-07      | Food & Drink            |               900.00 |            3 |           2500.00 |
++---------------------------+-----------------+-------------------------+----------------------+--------------+-------------------+
+15 rows in set (0.09 sec)
+
+
+
+
+
+
+//Total number of users who have signed up by their referral.
+
+ select count(*) as "users joined by referal"from users where referrer_id is not null;
++-------------------------+
+| users joined by referal |
++-------------------------+
+|                   11135 |
++-------------------------+
+1 row in set (0.03 sec)
+
