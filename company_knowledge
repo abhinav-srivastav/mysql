@@ -1,0 +1,270 @@
+create table skills(
+id int not null auto_increment,
+primary key(id),
+skill varchar(20)
+);
+
+ desc skills;
++-------+-------------+------+-----+---------+----------------+
+| Field | Type        | Null | Key | Default | Extra          |
++-------+-------------+------+-----+---------+----------------+
+| id    | int(11)     | NO   | PRI | NULL    | auto_increment |
+| skill | varchar(20) | YES  |     | NULL    |                |
++-------+-------------+------+-----+---------+----------------+
+2 rows in set (0.00 sec)
+
+
+insert into skills value(1,'html');
+insert into skills value(2,'javascript');
+insert into skills value(3,'ruby');
+insert into skills value(4,'rails');
+insert into skills value(5,'IOS');
+insert into skills value(6,'android');
+
+select * from skills;
++----+------------+
+| id | skill      |
++----+------------+
+|  1 | html       |
+|  2 | javascript |
+|  3 | ruby       |
+|  4 | rails      |
+|  5 | IOS        |
+|  6 | android    |
++----+------------+
+6 rows in set (0.00 sec)
+
+
+create table projects(
+id int not null,
+skill_project int not null,
+foreign key(skill_project) references skills(id)
+on delete cascade
+);
+
+ desc projects;
++---------------+---------+------+-----+---------+-------+
+| Field         | Type    | Null | Key | Default | Extra |
++---------------+---------+------+-----+---------+-------+
+| id            | int(11) | NO   |     | NULL    |       |
+| skill_project | int(11) | NO   | MUL | NULL    |       |
++---------------+---------+------+-----+---------+-------+
+2 rows in set (0.01 sec)
+
+
+insert into projects value(1,1);
+insert into projects value(1,2);
+insert into projects value(1,3);
+insert into projects value(1,4);
+insert into projects value(2,5);
+insert into projects value(3,6);
+insert into projects value(4,5);
+insert into projects value(4,6);
+insert into projects value(5,3);
+insert into projects value(5,4);
+insert into projects value(6,6);
+insert into projects value(6,1);
+insert into projects value(6,2);
+insert into projects value(7,6);
+insert into projects value(7,5);
+insert into projects value(8,1);
+insert into projects value(8,2);
+insert into projects value(8,3);
+insert into projects value(8,4);
+insert into projects value(8,6);
+insert into projects value(9,5);
+
+ select * from projects;
++----+---------------+
+| id | skill_project |
++----+---------------+
+|  1 |             1 |
+|  1 |             2 |
+|  1 |             3 |
+|  1 |             4 |
+|  2 |             5 |
+|  3 |             6 |
+|  4 |             5 |
+|  4 |             6 |
+|  5 |             3 |
+|  5 |             4 |
+|  6 |             6 |
+|  6 |             1 |
+|  6 |             2 |
+|  7 |             6 |
+|  7 |             5 |
+|  8 |             1 |
+|  8 |             2 |
+|  8 |             3 |
+|  8 |             4 |
+|  8 |             6 |
+|  9 |             5 |
++----+---------------+
+21 rows in set (0.00 sec)
+
+create table employee(
+id int not null,
+primary key (id),
+name varchar(20) not null
+);
+
+ desc  employee;
++-------+-------------+------+-----+---------+-------+
+| Field | Type        | Null | Key | Default | Extra |
++-------+-------------+------+-----+---------+-------+
+| id    | int(11)     | NO   | PRI | NULL    |       |
+| name  | varchar(20) | NO   |     | NULL    |       |
++-------+-------------+------+-----+---------+-------+
+2 rows in set (0.00 sec)
+
+insert into employee value (1,'A');
+insert into employee value (2,'B');
+insert into employee value (3,'C');
+insert into employee value (4,'D');
+select * from employee;
++----+------+
+| id | name |
++----+------+
+|  1 | A    |
+|  2 | B    |
+|  3 | C    |
+|  4 | D    |
++----+------+
+4 rows in set (0.00 sec)
+
+create table projects_emps(
+user_id int not null,
+foreign key(user_id) references users(id)
+on delete cascade,
+project_id int not null,
+status int not null
+);
+
+desc projects_emps;
++------------+---------+------+-----+---------+-------+
+| Field      | Type    | Null | Key | Default | Extra |
++------------+---------+------+-----+---------+-------+
+| user_id    | int(11) | NO   | MUL | NULL    |       |
+| project_id | int(11) | NO   |     | NULL    |       |
+| status     | int(11) | NO   |     | NULL    |       |
++------------+---------+------+-----+---------+-------+
+3 rows in set (0.00 sec)
+
+insert into projects_emps value (1,1,0);
+insert into projects_emps value (1,2,0);
+insert into projects_emps value (1,3,0);
+insert into projects_emps value (2,1,0);
+insert into projects_emps value (2,3,0);
+insert into projects_emps value (2,7,0);
+insert into projects_emps value (2,9,0);
+insert into projects_emps value (3,1,0);
+insert into projects_emps value (3,8,0);
+insert into projects_emps value (3,9,0);
+insert into projects_emps value (3,2,0);
+insert into projects_emps value (4,1,0);
+insert into projects_emps value (4,2,0);
+insert into projects_emps value (4,4,0);
+insert into projects_emps value(1,6,1);
+insert into projects_emps value(4,5,1);
+insert into projects_emps value(4,6,1);
+
+select * from projects_emps;
++---------+------------+--------+
+| user_id | project_id | status |
++---------+------------+--------+
+|       1 |          1 |      0 |
+|       1 |          2 |      0 |
+|       1 |          3 |      0 |
+|       2 |          1 |      0 |
+|       2 |          3 |      0 |
+|       2 |          7 |      0 |
+|       2 |          9 |      0 |
+|       3 |          1 |      0 |
+|       3 |          8 |      0 |
+|       3 |          9 |      0 |
+|       3 |          2 |      0 |
+|       4 |          1 |      0 |
+|       4 |          2 |      0 |
+|       4 |          4 |      0 |
+|       1 |          6 |      1 |
+|       4 |          5 |      1 |
+|       4 |          6 |      1 |
++---------+------------+--------+
+17 rows in set (0.00 sec)
+
+
+
+//Find names of all employees currently not working in any projects. (Use joins)
+
+select name from employee join projects_emps 
+on employee.id = projects_emps.user_id  group by name having sum(status) = 0
+ 
++------+
+| name |
++------+
+| B    |
+| C    |
++------+
+2 rows in set (0.00 sec)
+
+
+// Find all employees who have exposure to HTML, Javascript and IOS.
+
+
+
+select name from employee join projects_emps join projects
+on employee.id = projects_emps.user_id  and projects_emps.project_id = projects.id
+where skill_project in (1,2,5) group by name having count(distinct skill_project) = 3;
++------+
+| name |
++------+
+| A    |
+| B    |
+| C    |
+| D    |
++------+
+4 rows in set (0.00 sec)
+
+
+//Find the technologies in which a particular employee(Say B) has expertise(3 or more projects)
+
+ select skill_project from employee join projects_emps join projects
+  on employee.id = projects_emps.user_id  and projects_emps.project_id =  projects.id where name = 'B' group by skill_project having count(name) > 2;
+Empty set (0.00 sec)
+
+//Find the employee who has done most no of projects in android.
+
+select name from employee join projects_emps join projects
+on employee.id = projects_emps.user_id  and projects_emps.project_id = projects.id
+where skill_project = 6 group by name having count(skill_project) = (select count(skill_project) from employee join projects_emps join projects
+on employee.id = projects_emps.user_id  and projects_emps.project_id = projects.id
+where skill_project = 6 group by name order by count(skill_project) desc limit 1);
+
++------+
+| name |
++------+
+| A    |
+| B    |
+| D    |
++------+
+3 rows in set (0.00 sec)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
