@@ -1,0 +1,229 @@
+create table users(
+id int not null,
+primary key(id),
+name varchar(25)
+);
+
+desc users;
++-------+-------------+------+-----+---------+-------+
+| Field | Type        | Null | Key | Default | Extra |
++-------+-------------+------+-----+---------+-------+
+| id    | int(11)     | NO   | PRI | NULL    |       |
+| name  | varchar(25) | YES  |     | NULL    |       |
++-------+-------------+------+-----+---------+-------+
+2 rows in set (0.00 sec)
+
+
+create table friends(
+user_id int not null,
+foreign key(user_id) references users(id)
+on delete cascade,
+friend int not null,
+foreign key(friend) references users(id)
+on delete cascade
+);
+
+ desc friends;
++---------+---------+------+-----+---------+-------+
+| Field   | Type    | Null | Key | Default | Extra |
++---------+---------+------+-----+---------+-------+
+| user_id | int(11) | NO   | MUL | NULL    |       |
+| friend  | int(11) | NO   | MUL | NULL    |       |
++---------+---------+------+-----+---------+-------+
+2 rows in set (0.01 sec)
+
+
+
+
+create table images(
+id int not null,
+primary key(id),
+image_user int not null,
+foreign key(image_user) references users(id)
+on delete cascade
+);
+ desc images;
++------------+---------+------+-----+---------+-------+
+| Field      | Type    | Null | Key | Default | Extra |
++------------+---------+------+-----+---------+-------+
+| id         | int(11) | NO   | PRI | NULL    |       |
+| image_user | int(11) | NO   | MUL | NULL    |       |
++------------+---------+------+-----+---------+-------+
+2 rows in set (0.01 sec)
+
+
+
+
+create table tags(
+image_id int not null,
+foreign key(image_id) references images(id)
+on delete cascade,
+tagged int not null,
+foreign key(tagged) references users(id)
+on delete cascade
+);
+
+desc tags;
++----------+---------+------+-----+---------+-------+
+| Field    | Type    | Null | Key | Default | Extra |
++----------+---------+------+-----+---------+-------+
+| image_id | int(11) | NO   | MUL | NULL    |       |
+| tagged   | int(11) | NO   | MUL | NULL    |       |
++----------+---------+------+-----+---------+-------+
+2 rows in set (0.00 sec)
+
+
+insert into users value (1,'adam');
+insert into users value (2,'bryan');
+insert into users value (3,'cody');
+insert into users value (4,'dan');
+
+
+select * from users;
++----+-------+
+| id | name  |
++----+-------+
+|  1 | adam  |
+|  2 | bryan |
+|  3 | cody  |
+|  4 | dan   |
++----+-------+
+4 rows in set (0.00 sec)
+
+
+
+
+insert into friends value (1,2);
+insert into friends value (1,3);
+insert into friends value (2,4);
+insert into friends value (3,4);
+insert into friends value (2,1);
+insert into friends value (3,1);
+
+  select * from friends;
++---------+--------+
+| user_id | friend |
++---------+--------+
+|       1 |      2 |
+|       1 |      3 |
+|       2 |      4 |
+|       3 |      4 |
+|       2 |      1 |
+|       3 |      1 |
++---------+--------+
+6 rows in set (0.00 sec)
+
+
+insert into images value(1,3);
+insert into images value(2,1);
+insert into images value(3,1);
+insert into images value(4,2);
+insert into images value(5,1);
+insert into images value(6,4);
+
+select * from images;
++----+------------+
+| id | image_user |
++----+------------+
+|  2 |          1 |
+|  3 |          1 |
+|  5 |          1 |
+|  4 |          2 |
+|  1 |          3 |
+|  6 |          4 |
++----+------------+
+6 rows in set (0.01 sec)
+
+
+insert into tags value (1,1);
+insert into tags value (1,2);
+insert into tags value (2,3);
+insert into tags value (2,2);
+insert into tags value (3,2);
+insert into tags value (4,4);
+insert into tags value (5,2);
+insert into tags value (6,2);
+> select * from tags;
++----------+--------+
+| image_id | tagged |
++----------+--------+
+|        1 |      1 |
+|        1 |      2 |
+|        2 |      3 |
+|        2 |      2 |
+|        3 |      2 |
+|        4 |      4 |
+|        5 |      2 |
+|        6 |      2 |
++----------+--------+
+8 rows in set (0.00 sec)
+
+
+
+//Find image that has been tagged most no of times.
+ select image_id as image, count(tagged) as "total tags" from tags group by image_id having count(tagged) = (select count(tagged) from tags group by image_id order by count(tagged) desc limit 1);
++-------+------------+
+| image | total tags |
++-------+------------+
+|     1 |          2 |
+|     2 |          2 |
++-------+------------+
+2 rows in set (0.00 sec)
+
+
+//Find all images belonging to the friends of a particular user.
+
+select images.id from images where images.image_user in ( select friends.friend from friends where user_id = 1);
++----+
+| id |
++----+
+|  4 |
+|  1 |
++----+
+2 rows in set (0.00 sec)
+
+
+// Find all friends of a particular user (Say, userA) who has tagged him in all of his pics.
+
+ select distinct users.name from friends join images join tags join users
+ on image_user = friend where images.image_user in (select friends.friend from friends where user_id = 2) 
+  and tags.image_id = images.id and tags.tagged = user_id 
+  and users.id = user_id
+  group by images.id;
++-------+
+| name  |
++-------+
+| bryan |
++-------+
+1 row in set (0.00 sec)
+
+//Find friend of a particular user (Say, userA) who have tagged him most no. of times.
+
+select users.name,count(distinct image_id) as "total tags for bryan" from friends join images join tags join users 
+on image_user = friend where images.image_user in (select friends.friend from friends where user_id = 2) 
+and images.id = tags.image_id and tagged = user_id
+and users.id = friend
+group by image_user order by count(distinct image_id) desc limit 1;
+
++------+----------------------+
+| name | total tags for bryan |
++------+----------------------+
+| adam |                    3 |
++------+----------------------+
+1 row in set (0.01 sec)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
