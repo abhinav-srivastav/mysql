@@ -285,7 +285,18 @@ select city , count(email) as respondents from email_subscribers group by city h
 
 
 4.
- select substr(email,instr(email,'@')+1) as domain from email_subscribers group by domain;
+ select substring_index(email,'@',-1) as domain from email_subscribers group by domain;
++--------------+
+| domain       |
++--------------+
+| gmail.com    |
+| hotmail.com  |
+| me.com       |
+| yahoo.com    |
++--------------+
+4 rows in set (0.00 sec)
+
+
 +--------------+
 | domain       |
 +--------------+
@@ -298,10 +309,11 @@ select city , count(email) as respondents from email_subscribers group by city h
 
 5.
 
- select substr(email,instr(email,'@')+1) as domain ,count(substr(email,instr(email,'@')+1)) as count 
-    -> from email_subscribers group by domain having count = 
-    -> (select count(@domain := substr(email,instr(email,'@')+1)) as count
-    ->  from email_subscribers group by @domain order by count desc limit 1 );
+ select substring_index(email,'@',-1) as domain ,count(substring_index(email,'@',-1)) as count 
+     from email_subscribers group by domain having count = 
+     (select count(substring_index(email,'@',-1)) as co
+     from email_subscribers group by substring_index(email,'@',-1) order by co desc limit 1);
+				
 +------------+-------+
 | domain     | count |
 +------------+-------+
