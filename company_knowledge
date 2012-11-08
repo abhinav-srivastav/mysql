@@ -196,12 +196,8 @@ select * from projects_emps;
 
 //Find names of all employees currently not working in any projects. (Use joins)
 
-select name from employee join projects_emps 
-on employee.id = projects_emps.user_id  group by name having sum(status) = 0
-
-!!! select name from employee join projects_emps 
-on employee.id = projects_emps.user_id group by name having group_concat(distinct status) = 0 and count(distinct status) = 1;
-
+select name from (select * from projects_emps join employee where employee.id =  projects_emps.user_id )pe
+ left join (select * from projects_emps where status = 1)t1  on t1.user_id = pe.user_id where t1.user_id is NULL group by pe.user_id 
  
 +------+
 | name |

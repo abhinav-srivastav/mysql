@@ -1,11 +1,12 @@
 //List of member who have ever bought something on Dealdey, their signup date, their first purchase category, First purchase price, Total number of purchases till date, Total money spent with the site till date
 
 select concat(users.firstname," ",users.lastname) as User, date(users.created_at) as "Date of joining", categories.name as "first purchase category",(du.unit_price * du.quantity) as "first purchase price"
-,COUNT(du.id) as "total orders",sum(du.unit_price * du.quantity) as "total money spent" from deals_users as du 
-join users join deals join categories
+,COUNT(du.id) as "total orders",sum(du.unit_price * du.quantity) as "total money spent",ref.referals from deals_users as du 
+join users join deals join categories join (select count(*) as referals,referrer_id from users group by referrer_id)ref
 on users.id = du.user_id
 and deals.id = du.deal_id
 and categories.id = deals.category_id 
+and users.id = ref.referrer_id
 group by user_id order by du.created_at limit 15;
 
 +---------------------------+-----------------+-------------------------+----------------------+--------------+-------------------+
@@ -30,7 +31,7 @@ group by user_id order by du.created_at limit 15;
 15 rows in set (0.09 sec)
 
 
-
+select count(*),referrer_id from users group by referrer_id 
 
 
 
