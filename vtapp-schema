@@ -1,0 +1,143 @@
+ create table users
+    -> (
+    -> id int not null ,
+    -> primary key(id),
+    -> user varchar(25) not null,
+    -> type SET('admin','owner','reviewer','runner') not null
+    -> );
+Query OK, 0 rows affected (0.15 sec)
+
+mysql> desc users;
++-------+------------------------------------------+------+-----+---------+-------+
+| Field | Type                                     | Null | Key | Default | Extra |
++-------+------------------------------------------+------+-----+---------+-------+
+| id    | int(11)                                  | NO   | PRI | NULL    |       |
+| user  | varchar(25)                              | NO   |     | NULL    |       |
+| type  | set('admin','owner','reviewer','runner') | NO   |     | NULL    |       |
++-------+------------------------------------------+------+-----+---------+-------+
+3 rows in set (0.00 sec)
+
+create table tracks
+    -> (
+    -> id int not null auto_increment,
+    -> primary key (id),
+    -> trackname varchar(20) not null,
+    -> owner int not null,
+    -> foreign key(owner) references users(id)
+    -> on delete cascade
+    -> ); 
+Query OK, 0 rows affected (0.21 sec)
+
+mysql> desc tracks;
++-----------+-------------+------+-----+---------+----------------+
+| Field     | Type        | Null | Key | Default | Extra          |
++-----------+-------------+------+-----+---------+----------------+
+| id        | int(11)     | NO   | PRI | NULL    | auto_increment |
+| trackname | varchar(20) | NO   |     | NULL    |                |
+| owner     | int(11)     | NO   | MUL | NULL    |                |
++-----------+-------------+------+-----+---------+----------------+
+3 rows in set (0.00 sec)
+
+create table track_runner 
+(
+	track_id int not null,
+	foreign key(track_id) references tracks(id)
+	on delete cascade,
+	runner int not null,
+	foreign key(runner) references users(id)
+	on delete cascade
+);
+desc track_runner;
++----------+---------+------+-----+---------+-------+
+| Field    | Type    | Null | Key | Default | Extra |
++----------+---------+------+-----+---------+-------+
+| track_id | int(11) | NO   | MUL | NULL    |       |
+| runner   | int(11) | NO   | MUL | NULL    |       |
++----------+---------+------+-----+---------+-------+
+2 rows in set (0.00 sec)
+
+create table track_reviewer
+(
+	track_id int not null,
+	foreign key(track_id) references tracks(id)
+	on delete cascade,
+	reviewer int not null,
+	foreign key(reviewer) references users(id)
+	on delete cascade
+);
+
+desc track_reviewer;
++----------+---------+------+-----+---------+-------+
+| Field    | Type    | Null | Key | Default | Extra |
++----------+---------+------+-----+---------+-------+
+| track_id | int(11) | NO   | MUL | NULL    |       |
+| reviewer | int(11) | NO   | MUL | NULL    |       |
++----------+---------+------+-----+---------+-------+
+2 rows in set (0.00 sec)
+
+create table track_question_type
+(
+id int not null auto_increment ,
+primary key(id),
+track_id int not null,
+foreign key(track_id) references tracks(id)
+on delete cascade,
+question_type ENUM('task','exercise') not null
+);
+
+  desc track_question_type;
++---------------+-------------------------+------+-----+---------+----------------+
+| Field         | Type                    | Null | Key | Default | Extra          |
++---------------+-------------------------+------+-----+---------+----------------+
+| id            | int(11)                 | NO   | PRI | NULL    | auto_increment |
+| track_id      | int(11)                 | NO   | MUL | NULL    |                |
+| question_type | enum('task','exercise') | NO   |     | NULL    |                |
++---------------+-------------------------+------+-----+---------+----------------+
+3 rows in set (0.00 sec)
+
+
+create table questions 
+(
+	id int not null,
+	primary key(id),
+	track_id int not null,
+	foreign key(track_id) references track_question_type(id)
+	on delete cascade,
+	question_description longtext
+);
+
+ desc questions;
++----------------------+----------+------+-----+---------+-------+
+| Field                | Type     | Null | Key | Default | Extra |
++----------------------+----------+------+-----+---------+-------+
+| id                   | int(11)  | NO   | PRI | NULL    |       |
+| track_id             | int(11)  | NO   | MUL | NULL    |       |
+| question_description | longtext | YES  |     | NULL    |       |
++----------------------+----------+------+-----+---------+-------+
+3 rows in set (0.01 sec)
+
+
+create table status (
+	task_id int not null,
+	foreign key(task_id) references questions(id)
+	on delete cascade,
+	runner int not null,
+	foreign key(runner) references users(id)
+	on delete cascade,
+	status ENUM('START','FINISHED'),
+	reviewer int not null,
+	foreign key(reviewer) references users(id)
+	on delete cascade,
+	reviewer_status ENUM('ACCEPTED','REJECTED')
+);
+desc status;
++-----------------+-----------------------------+------+-----+---------+-------+
+| Field           | Type                        | Null | Key | Default | Extra |
++-----------------+-----------------------------+------+-----+---------+-------+
+| task_id         | int(11)                     | NO   | MUL | NULL    |       |
+| runner          | int(11)                     | NO   | MUL | NULL    |       |
+| status          | enum('START','FINISHED')    | YES  |     | NULL    |       |
+| reviewer        | int(11)                     | NO   | MUL | NULL    |       |
+| reviewer_status | enum('ACCEPTED','REJECTED') | YES  |     | NULL    |       |
++-----------------+-----------------------------+------+-----+---------+-------+
+5 rows in set (0.00 sec)

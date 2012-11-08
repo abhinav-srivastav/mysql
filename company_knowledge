@@ -198,6 +198,10 @@ select * from projects_emps;
 
 select name from employee join projects_emps 
 on employee.id = projects_emps.user_id  group by name having sum(status) = 0
+
+!!! select name from employee join projects_emps 
+on employee.id = projects_emps.user_id group by name having group_concat(distinct status) = 0 and count(distinct status) = 1;
+
  
 +------+
 | name |
